@@ -1,4 +1,5 @@
-This is the continuation of the micro-service [FLihgts_API](https://github.com/tanuj-kalonia/Flights_API) which contains all the buisness logic of the FLight API.
+### 
+This is the continuation of the micro-service [Flights_API](https://github.com/tanuj-kalonia/Flights_API) which contains all the buisness logic of the FLight API.
 
 This micro-service specificly handles the buisness logic of booking of a flight by the user. This includes flight booking, payments gateway routes etc..
 
