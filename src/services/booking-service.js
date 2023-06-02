@@ -56,7 +56,7 @@ async function makePayment(data) {
         const bookingTime = new Date(bookingDetails.createdAt);
         const currentTime = new Date();
 
-        if (currentTime - bookingTime > 100000) { // after 5 min, cancel the booking if payment not done
+        if (currentTime - bookingTime > 300000) { // after 5 min, cancel the booking if payment not done
             await cancelBooking(data.bookingId);
             throw new AppError('The Booking has expired', StatusCodes.BAD_REQUEST);
         }
@@ -101,7 +101,18 @@ async function cancelBooking(bookingId) {
     }
 }
 
+async function cancelOldBookings() {
+    try {
+        const time = new Date(Date.now() - 1000 * 300)// 5 min
+        const response = await bookingRepository.cancelOldBookings(time);
+        return response;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 module.exports = {
     createBooking,
-    makePayment
+    makePayment,
+    cancelOldBookings
 }
