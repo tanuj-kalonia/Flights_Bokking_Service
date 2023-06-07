@@ -1,5 +1,5 @@
 const express = require('express');
-const { ServerConfig, LoggerConfig } = require("./config");
+const { ServerConfig, Queue, LoggerConfig } = require("./config");
 
 const apiRoutes = require('./routes')
 
@@ -12,9 +12,11 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api', apiRoutes);
 
-app.listen(ServerConfig.PORT, () => {
+app.listen(ServerConfig.PORT, async () => {
     console.log(`Server running at Port : ${ServerConfig.PORT}`);
     CRON();
+    await Queue.connectQueue();
+    console.log("qeue connected");
     // This will print the logs on the console.
     // LoggerConfig.info('Server is up here')
 })

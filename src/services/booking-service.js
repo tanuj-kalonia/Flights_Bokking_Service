@@ -1,8 +1,9 @@
 const axios = require("axios")
 const { StatusCodes } = require('http-status-codes');
-const { ServerConfig } = require('../config')
+const { ServerConfig, Queue } = require('../config')
 const AppError = require('../utils/errors/app-error')
 const db = require('../models')
+const { Users } = require('../models')
 const enums = require('../utils/common/enum')
 
 const { BOOKED, CANCELLED } = enums.BOOKING_STATUS;
@@ -48,7 +49,7 @@ async function makePayment(data) {
     const transaction = await db.sequelize.transaction();
     try {
         const bookingDetails = await bookingRepository.get(data.bookingId, transaction);
-        console.log(bookingDetails);
+
         if (bookingDetails.status == CANCELLED) {
             throw new AppError('The Booking has expired', StatusCodes.BAD_REQUEST);
         }
@@ -67,10 +68,23 @@ async function makePayment(data) {
         if (bookingDetails.userId != data.userId) {
             throw new AppError('The user corrosponding to booking doesnot match', StatusCodes.BAD_REQUEST);
         }
-        // we assume that the payment is successfull here 
+        // we assume that the payment is successfull here , send mail to the user
         // booking status , initiated -> booked
-        await bookingRepository.update(data.bookingId, { status: BOOKED }, transaction)
+        await bookingRepository.update(data.bookingId, { status: BOOKED }, transaction);
+
+        const userId = bookingDetails.userId;
+        const response = await axios.get(`${ServerConfig.AUTH_SERVICE}/api/v1/user/${userId}`)
+        const userEmail = response.data.data;
+
+        Queue.sendData({
+            recepientEmail: userEmail,
+            subject: 'Flight booked',
+            text: `Booking successfully done for the booking ${data.bookingId} and for the user ${userEmail}`
+        });
+        await transaction.commit();
+
     } catch (error) {
+        console.log(error);
         await transaction.rollback();
         throw error;
     }
