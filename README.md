@@ -1,9 +1,8 @@
-### 
-This is the continuation of the micro-service [Flights_API](https://github.com/tanuj-kalonia/Flights_API) which contains all the buisness logic of the FLight API.
+### This is the continuation of the micro-service [Flights_API](https://github.com/tanuj-kalonia/Flights_API) which contains all the buisness logic of the FLight API.
 
-This micro-service specificly handles the buisness logic of booking of a flight by the user. This includes flight booking, payments gateway routes etc..
+This microservice specifically handles the business logic of flight booking by the user. This includes flight booking, payment gateway routes (dummy as of now), handling concurrent booking of the same seats by different users (Atomic property of ACID), locks on the database to avoid dirty reads and serialize the requests. Avoiding the case of double or multiple payments by the user by making the API Idempotent, auto-cancelling the flight bookings that are not processed by the user using node-cron, and much more.
 
-Both the service interacts with the common SQL-based database - powered by Sequelize ORM
+### Both the service interacts with the common SQL-based database - powered by Sequelize ORM
 
 ### Setup the project
 
